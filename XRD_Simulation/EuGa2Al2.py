@@ -18,7 +18,7 @@ matplotlib.rc('text', usetex=True)
 # Include tool: HKL_0 or HK_0L maps?, if HKL0: else: K-space creator
 """K-space creator"""
 k0, l0, kmax, lmax = 0, 0, 15, 15  #  boundaries of K and L for the intensity maps
-deltak = 0.1  #  or 0.1, k-space point distance
+deltak = 0.01  #  or 0.1, k-space point distance
 h = 1  #  H value in k space
 z_Ga = 0.35
 k = np.arange(k0-kmax, k0+kmax + deltak, deltak)
