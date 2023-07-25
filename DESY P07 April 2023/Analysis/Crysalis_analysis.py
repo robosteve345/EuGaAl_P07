@@ -41,25 +41,24 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
                        )
     ax.set_ylim([-ylim, ylim])
     # ax.set_title(''.format(title))
-    ax.set_xlim([xlim, qpixelx * (NX / 2.)])
+    ax.set_xlim([6, qpixelx * (NX / 2.)])
     ax.set_xlabel("H (rlu)")
     ax.set_ylabel("L (rlu)")
-    ax.grid(True, which='both', axis='both', linestyle='-', color='black')
+    ax.grid(True, which='both', axis='both', linestyle='--', lw=0.25, color='black')
+    ax.set_yticks(np.arange(-14, 14 ,1))
+    ax.set_xticks(np.arange(6,9,1))
     fig.colorbar(im, ax=ax)
     plt.show()
 
 
 def main():
     print(__name__)
-    list = ["0p5_159_H0L_0.5A.img", "0p5_159_H1L_0.5A.img", "0p5_159_HK0_0.5A.img", "0p5_159_Hm1L_0.5A.img"]  #For batch-processing, define list with img-names
-    imgplot(list[3], 0.5, 4.3262, 10.929, xlim=-1, ylim=14, title='159_Hm1L')  #Process by iterating through given list with imgplot-function
+    list = ["0p5_159_H0L_0.5A.img", "0p5_159_H1L_0.5A.img", "0p5_159_HK0_0.5A.img", "0p5_159_Hm1L_0.5A.img", "0p5_001_h_0_l.img"]  #For batch-processing, define list with img-names
+    imgplot(list[4], 0.8, 4.2599, 10.806, xlim=-1, ylim=14, title='001_H0L')  #Process by iterating through given list with imgplot-function
 
 
 if __name__ == "__main__":
     main()
-
-
-
 
 
 # steven = "0p5_159_H0L_0.5A.img"
