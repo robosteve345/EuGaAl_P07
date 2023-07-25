@@ -34,7 +34,6 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
     qyrange = np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.), qpixely)
     qx, qy = np.meshgrid(qxrange, qyrange)
     # PLOTTING
-    plt.subplot(2, 1, 1)
     fig, ax = plt.subplots(figsize=(9, 7))
     cmap = cm.get_cmap("viridis")
     im = ax.pcolormesh(qx, qy, data, cmap=cmap,
@@ -52,11 +51,12 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
     print("FILE: {}".format(title))
     print("Resolution: {}, a={}Å, c={}Å".format(resolution, lat_a, lat_c))
     plt.savefig("{}.jpg".format(title), dpi=300)
-    plt.show()
-    plt.subplot(2, 1, 2)
+    plt.figure()
     print(2/qpixelx)
-    y = data[:, 210]
-    plt.plot(np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.), qpixely), y, ls='', marker='.')
+    for i in range(int(NX/2 + 250), int(NX/2+300)):
+        y = data[:, i]
+        plt.plot(np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.), qpixely), y, ls='', marker='.', label='pixelx={}'.format(i))
+        plt.legend()
     plt.show()
 
 
