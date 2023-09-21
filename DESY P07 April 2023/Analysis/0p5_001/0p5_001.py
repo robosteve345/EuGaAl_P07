@@ -37,7 +37,7 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
     fig, ax = plt.subplots(figsize=(9, 7))
     cmap = cm.get_cmap("viridis")
     im = ax.pcolormesh(qx, qy, data, cmap=cmap,
-                       norm=LogNorm(vmin=10, vmax=np.max(data))
+                       #norm=LogNorm(vmin=10, vmax=np.max(data))
                        )
     ax.set_ylim([-ylim, ylim])
     fig.suptitle("a={}, c={}".format(lat_a, lat_c))

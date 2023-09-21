@@ -9,7 +9,7 @@ from matplotlib.colors import LogNorm
 from matplotlib.pyplot import *
 matplotlib.rcParams['font.family'] = "sans-serif"
 matplotlib.rcParams['pcolor.shading']
-matplotlib.rc('text', usetex=True)
+matplotlib.rcParams['text.usetex'] = False
 
 """Print unwarped CrysAlisPro intensity maps"""
 
@@ -35,9 +35,9 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
     qx, qy = np.meshgrid(qxrange, qyrange)
     # PLOTTING
     fig, ax = plt.subplots(figsize=(9, 7))
-    cmap = cm.get_cmap("terrain")
-    im = ax.pcolormesh(qx, qy, data, cmap=cmap,
-                       norm=LogNorm(vmin=10, vmax=np.max(data))
+    cmap = cm.get_cmap("viridis")
+    im = ax.pcolormesh(qx, qy, data, cmap=cmap, shading='nearest',
+                       norm=LogNorm(vmin=1.1, vmax=np.max(data))
                        )
     ax.set_ylim([-ylim, ylim])
     fig.suptitle("a={}, c={}".format(lat_a, lat_c))
@@ -56,11 +56,7 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
 
 def main():
     print(__doc__)
-    # For batch-processing, define list with img-names
-    list = ["0p5_159_H0L_0.5A_fabian.img", "0p5_159_H0L_0.5A_2.img", "0p5_159_H1L_0.5A.img", "0p5_159_HK0_0.5A.img",
-            "0p5_159_Hm1L_0.5A.img", "0p5_001_h_0_l.img"]
-
-    imgplot(list[0], 0.5, 4.3262, 10.996, xlim=-1, ylim=14, title='0p5_159_H0L_0.5A')  #Process by iterating through given list with imgplot-function
+    imgplot("0p5_159_H0L_0.5A_1.img", 0.5, 4.3262, 10.996, xlim=-1, ylim=14, title='0p5_159_H0L_0.5A_1')  #Process by iterating through given list with imgplot-function
 if __name__ == "__main__":
     main()
 

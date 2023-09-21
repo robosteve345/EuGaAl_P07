@@ -8,8 +8,8 @@ import numpy as np
 from matplotlib.colors import LogNorm
 from matplotlib.pyplot import *
 matplotlib.rcParams['font.family'] = "sans-serif"
-matplotlib.rcParams['pcolor.shading']
-matplotlib.rc('text', usetex=True)
+matplotlib.rcParams['text.usetex'] = False
+plt.rcParams['pcolor.shading'] ='nearest'
 
 """Print unwarped CrysAlisPro intensity maps for EuGa2Al2 run 10"""
 
@@ -30,14 +30,16 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
     qpixelx = 2 * qmaxa / NX
     qpixely = 2 * qmaxc / NY
     # qpixel = qmax/NX
-    qxrange = np.arange(-qpixelx * (NX / 2.), qpixelx * (NX / 2.), qpixelx)
-    qyrange = np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.), qpixely)
+    qxrange = np.arange(-qpixelx * (NX / 2.), qpixelx * (NX / 2.) , qpixelx)
+    qyrange = np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.) , qpixely)
     qx, qy = np.meshgrid(qxrange, qyrange)
     # PLOTTING
     fig, ax = plt.subplots(figsize=(9, 7))
     cmap = cm.get_cmap("viridis")
-    im = ax.pcolormesh(qx, qy, data, cmap=cmap,
-                       norm=LogNorm(vmin=10, vmax=np.max(data))
+    print("len qx={}, len qy={}".format(len(qx), len(qy)))
+    # OLD VERSION: WITH ax.pcolor
+    im = ax.pcolor(qx, qy, data, cmap=cmap,
+                       #norm=LogNorm(vmin=10, vmax=np.max(data))
                        )
     fig.suptitle("a={}, c={}".format(lat_a, lat_c))
     # ax.set_ylim([-ylim, ylim])
@@ -53,12 +55,15 @@ def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
     plt.savefig("{}.jpg".format(title), dpi=300)
     plt.figure()
     print(2/qpixelx)
-    for i in range(int(NX/2 + 250), int(NX/2+300)):
+    for i in range(int(NX/2 + 250), int(NX/2 + 300)):
         y = data[:, i]
-        plt.plot(np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.), qpixely), y, ls='', marker='.', label='pixelx={}'.format(i))
+        plt.plot(np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.),
+                           qpixely), y, ls='', marker='.',
+                 label='pixelx={}'.format(i))
         plt.legend()
+    plt.figure()
+    plt.contour(qx, qy, data, cmap='magma')
     plt.show()
-
 
 def main():
     print(__doc__)
@@ -73,7 +78,7 @@ def main():
     # plt.show()
     ##########
 
-    imgplot(list[6], 0.5, 4.2726, 10.792, xlim=-1, ylim=14, title='al2ga2_010_0KL_0.5A')  #Process by iterating through given list with imgplot-function
+    imgplot(list[1], 0.5, 4.2726, 10.792, xlim=-1, ylim=14, title='al2ga2_010_0KL_0.5A')  #Process by iterating through given list with imgplot-function
 
 if __name__ == "__main__":
     main()
