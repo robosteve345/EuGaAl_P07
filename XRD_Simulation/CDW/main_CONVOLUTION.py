@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
-# Times, Palatino, New Century Schoolbook, Bookman, Computer Modern Roman
+import matplotlib as mpl
+from scipy import ndimage
+mpl.rcParams.update(mpl.rcParamsDefault)
 
 
 def translation(x, storage_x, storage_y, storage_z, i):
@@ -116,7 +118,7 @@ def F_Q(k2d, l2d, h, n, a_eu, a_ga, a_al, b_eu, b_ga, b_al, c_eu, c_ga, c_al, u_
 
     """Ga_z modulation:"""
     q_cdw = 1 / 10  # in r.l.u.
-    z_ampl = 0
+    z_ampl = -0.18
     print("CDW Modulation A*sin(q_cdw*z*2*pi):")
     print("q_cdw={}, A={}".format(q_cdw, z_ampl))
     zp = 0.13  # relative position Ga-Al in z-direction, FESTER WERT
@@ -137,8 +139,10 @@ def F_Q(k2d, l2d, h, n, a_eu, a_ga, a_al, b_eu, b_ga, b_al, c_eu, c_ga, c_al, u_
     fig, axs = plt.subplots(2, 2, figsize=(10, 5))
 
     # fig.suptitle(r'CDW modulation simulation for $EuGa_2Al_2$')
-    axs[0, 0].scatter(np.asarray(z) + np.asarray(dz), np.ones(40) * 0.5, c='r', marker='.', label='Modulated')
-    axs[0, 0].scatter(np.asarray(z), np.ones(40) * 0.5, c='k', marker='.', label='Unmodulated')
+    fig = plt.figure(figsize=(15,4), dpi=100)
+    np.scatter(np.asarray(z) + np.asarray(dz), np.ones(40) * 0.5, c='r', marker='.', label='Modulated')
+    np.scatter(np.asarray(z), np.ones(40) * 0.5, c='k', marker='.', label='Unmodulated')
+    plt.show()
 
     # plt.scatter(z_Ga1_T_mod, np.ones(10) * 0.5, c='r', marker='.')
     # plt.scatter(z_Ga2_mod, np.ones(10) * 0.5, c='k', marker='.', label='Wyckoff 4e(2)')

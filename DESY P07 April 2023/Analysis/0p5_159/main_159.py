@@ -77,7 +77,7 @@ fig.colorbar(im, ax=ax)
 #     plt.xlim(-ylim, ylim)
 #     plt.legend()
 #     plt.savefig("0p5_001_H0L_0.5A_Linecuts_H={}.jpg".format(H), dpi=300)
-plt.show()
+
 
 
 

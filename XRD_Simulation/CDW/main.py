@@ -1,11 +1,18 @@
-"""XRD_Simulation of CDW pattern in k-space for 10 unit cells of EuGa2Al2 with symmetry I4/mmm
+"""XRD Simulation of CDW pattern in k-space for EuGa2Al2 with symmetry I4/mmm
+    Features:   Q-dependent Debye-Waller-Factor
+                Q- and element-specific Atomic form factors    
 """
+
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib import rc
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
-# Times, Palatino, New Century Schoolbook, Bookman, Computer Modern Roman
+from matplotlib.colors import LogNorm
+from matplotlib.pyplot import figure
+matplotlib.rcParams['font.family'] = "sans-serif"
+matplotlib.rc('text', usetex=True)
+import matplotlib as mpl
+from scipy import ndimage
+mpl.rcParams.update(mpl.rcParamsDefault)
 
 
 def translation(x, storage_x, storage_y, storage_z, i):
@@ -103,12 +110,12 @@ def main():
     print(__doc__)
     ####### INPUT KSPACE: boundary / diff ≈ 100 sufficient resolution
     diff = 0.01  # Distance between two kspace points
-    l_boundary, k_boundary = 2, 2
+    lmax, kmax = 2, 2
     h = -3
     ############################################ # For CDW Plot
     k0, l0 = 5, -6
-    k = np.arange(k0 - k_boundary, k0 + k_boundary + 0.1, 0.1)
-    l = np.arange(l0 - l_boundary, l0 + l_boundary + 0.1, 0.1)
+    k = np.arange(k0 - kmax, k0 + kmax + 0.1, 0.1)
+    l = np.arange(l0 - lmax, l0 + lmax + 0.1, 0.1)
     n = len(k)
     k2d, l2d = np.meshgrid(k, l)
     # print("#n={}".format(len(k)))
@@ -150,7 +157,21 @@ def main():
     # Positions of atoms in 10 unit cells
     # Gebe ersten Vektor der verschobenen und nicht verschobenen Positionen der Atome an:
     # Translated positions about \vec{r} = (0.5,0.5,0.5)
-    e
+
+    x_Eu, y_Eu, z_Eu = [0], [0], [0]
+    x_Eu_T, y_Eu_T, z_Eu_T = [0.5], [0.5], [0.5]
+
+    # Aluminium:
+    x_Al1, y_Al1, z_Al1 = [0], [0.5], [0.25]
+    x_Al1_T, y_Al1_T, z_Al1_T = [0.5], [1], [0.75]
+    x_Al2, y_Al2, z_Al2 = [0.5], [0], [0.25]
+    x_Al2_T, y_Al2_T, z_Al2_T = [1], [0.5], [0.75]
+
+    # Gallium:
+    x_Ga1, y_Ga1, z_Ga1 = [0], [0], [z0]
+    x_Ga1_T, y_Ga1_T, z_Ga1_T = [0.5], [0.5], [0.5 + z0]
+    x_Ga2, y_Ga2, z_Ga2 = [0], [0], [-z0 + 1]
+    x_Ga2_T, y_Ga2_T, z_Ga2_T = [0.5], [0.5], [0.5 - z0]
     # Full translation of Eu, Al, first translation without modulation of Ga:
     for i in range(1,10):
         translation(np.array([x_Eu[0], y_Eu[0], z_Eu[0]]), x_Eu, y_Eu, z_Eu, i)  # Eu
@@ -163,7 +184,6 @@ def main():
         translation(np.array([x_Ga1_T[0], y_Ga1_T[0], z_Ga1_T[0]]), x_Ga1_T, y_Ga1_T, z_Ga1_T, i)
         translation(np.array([x_Ga2[0], y_Ga2[0], z_Ga2[0]]), x_Ga2, y_Ga2, z_Ga2, i)  # Ga2
         translation(np.array([x_Ga2_T[0], y_Ga2_T[0], z_Ga2_T[0]]), x_Ga2_T, y_Ga2_T, z_Ga2_T, i)
-
 
 
     """Ga_z modulation:"""
@@ -195,7 +215,7 @@ def main():
     print("CDW Modulation A*sin(q_cdw*z*2*pi):")
     print("q_cdw={}, A={}".format(q_cdw, z_ampl))
     zp = 0.13 #relative position Ga-Al in z-direction, FESTER WERT
-    z=[]
+    z = []
     dz, weird = [], []
     for i in range(1, 41):
         z.append((i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)
@@ -204,19 +224,20 @@ def main():
         # weird.append((i/4 + 1/8 + 1/8 * (-1)**(i+1)))
 
         # Modulation 2: fourier series with q_cdw=0.10
-        dz.append((-1)**i * z_ampl[0] * ( np.cos(2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i) +  np.sin(2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)) +
-                  (-1)**i * z_ampl[1] * ( np.cos(2*2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i) +  np.sin(2*2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)) +
-                  (-1)**i * z_ampl[2] * ( np.cos(2*3*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i) +  np.sin(2*3*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)) +
-                  (-1) ** i * z_ampl[3] * (np.cos(4*
-            2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i) + np.sin(4*
-            2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i)) +
-                  (-1) ** i * z_ampl[4] * (np.cos(
-            5 * 2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i) + np.sin(
-            5 * 2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i)) +
-                  (-1) ** i * z_ampl[5] * (np.cos(
-            6 * 3 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i) + np.sin(
-            6 * 3 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i))
-                  )
+        dz.append((-1)**i * z_ampl[0] * ( np.cos(2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)  
+            #                             np.sin(2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)) 
+            #      + (-1)**i * z_ampl[1] * ( np.cos(2*2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i) +  np.sin(2*2*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)) +
+            #       (-1)**i * z_ampl[2] * ( np.cos(2*3*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i) +  np.sin(2*3*np.pi*q_cdw *  (i/4 - 1/8) + 1/8*(-1)**(i+1)+zp*(-1)**i)) +
+            #       (-1) ** i * z_ampl[3] * (np.cos(4*
+            # 2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i) + np.sin(4*
+            # 2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i)) +
+            #       (-1) ** i * z_ampl[4] * (np.cos(
+            # 5 * 2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i) + np.sin(
+            # 5 * 2 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i)) +
+            #       (-1) ** i * z_ampl[5] * (np.cos(
+            # 6 * 3 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i) + np.sin(
+            # 6 * 3 * np.pi * q_cdw * (i / 4 - 1 / 8) + 1 / 8 * (-1) ** (i + 1) + zp * (-1) ** i))
+                  ))
     # print("input for sin from marein: {}".format(weird))
     print("Gallium z-positions and deviations dz:")
     print("z={}".format(np.round(z, 2)), "# z={}".format(len(z)),
@@ -316,39 +337,55 @@ def main():
     # 2d scatter plot
     # print("k2d={}, l2d={}".format(k2d, l2d))
     # plot whole space:
+    fig = plt.figure(figsize=(15,4), dpi=100)
     axs[1,0].scatter(k2d, l2d, s=I*scatterfactor, linewidth=0.05, c='k')
     axs[1,0].set_ylabel(r"L (r.l.u.)", fontsize=15)
     axs[1,0].set_xlabel(r"K (r.l.u.)", fontsize=15)
     axs[1,0].tick_params(axis='x', labelsize=15, direction='in')
     axs[1,0].tick_params(axis='y', labelsize=15, direction='in')
-    readout = l_boundary * 10 # readout: l_k_boundary * 10, centers around desired [HKL] peak
-    # print("I_min/I_max = {}".format(np.min(I)/np.max(I)))
+    readout = lmax * 10 # readout: l_kmax * 10, centers around desired [HKL] peak
     # Centered peak
     axs[0,1].set_xlabel(r'L (r.l.u.)', fontsize=15)
     axs[0,1].set_ylabel(r'K (r.l.u.)', fontsize=15)
     axs[0,1].tick_params(axis='x', labelsize=15, direction='in')
     axs[0,1].tick_params(axis='y', labelsize=15, direction='in')
-    # axs[0,1].set_xlim(k0-k_boundary-0.5, k0+k_boundary+0.5)
-    axs[0,1].set_ylim(k0 - k_boundary, k0 + k_boundary)
-    axs[0,1].set_xlim(l0 - l_boundary, l0 + l_boundary)
+    # axs[0,1].set_xlim(k0-kmax-0.5, k0+kmax+0.5)
+    axs[0,1].set_ylim(k0 - kmax, k0 + kmax)
+    axs[0,1].set_xlim(l0 - lmax, l0 + lmax)
     axs[0,1].scatter(l2d[:, readout], k2d[:, readout], s=I[:, readout]*scatterfactor, linewidth=0.05, c='k',
                    label='[{}KL]'.format(h))
     axs[0,1].legend(fontsize=15)
     # print("single peak: k={}, l={}".format(k2d[:, readout], l2d[:, readout]))
     # Projected intensity of desired [HKL]-peak
     axs[1,1].plot(l2d[:, readout], I[:, readout] / np.max(I[:, readout]), marker='x', c='k', ls='--', lw=0.5, ms=3, label='[{}KL]'.format(h))
-    axs[1,1].set_xlim(l0 - l_boundary, l0 + l_boundary)
+    axs[1,1].set_xlim(l0 - lmax, l0 + lmax)
     axs[1,1].set_xlabel(r"L (r.l.u.)", fontsize=15)
     axs[1,1].set_ylabel(r"Intensity (Rel.)", fontsize=15)
     axs[1,1].tick_params(axis='x', labelsize=15, direction='in')
     axs[1,1].tick_params(axis='y', labelsize=15, direction='in')
     axs[1,1].legend(fontsize=15)
-    print("I_max = {}".format(np.sort(I[:, readout])[-1]))
-    print("(I_max - I_[max-1])/I_max = {}".format((np.sort(I[:, readout])[-1] - np.sort(I[:, readout])[-2]) / np.sort(I[:, readout])[-1]))
+    # print("I_max = {}".format(np.sort(I[:, readout])[-1]))
+    # print("(I_max - I_[max-1])/I_max = {}".format((np.sort(I[:, readout])[-1] - np.sort(I[:, readout])[-2]) / np.sort(I[:, readout])[-1]))
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
     # plt.savefig('CDW_sim_HK0L0_FOURIER={}{}{}'.format(h, k0, l0), dpi=300)
-
-    plt.show()
+    
+    fig = plt.figure(figsize=(15,4), dpi=100)
+    plt.title("Gaussian convolution")
+    kernelsize, sigma = 5, 0.1
+    x, y = np.linspace(-1,1,kernelsize), np.linspace(-1,1,kernelsize)
+    X, Y = np.meshgrid(x, y)
+    kernel = 1/(2*sigma**2)*np.exp(-(X**2+Y**2)/(2*sigma**2))
+    Iconv = ndimage.convolve(I, kernel, mode='constant', cval=0.0)
+    plt.imshow(Iconv, cmap='inferno', 
+               extent=(k0-kmax, k0+kmax, l0-lmax, l0+lmax), 
+                   origin='lower',
+                   #vmin=0, vmax=0.1*np.max(Iconv)
+                   norm=LogNorm(vmin = 1, vmax = np.max(Iconv))
+                   )
+    plt.colorbar()
+    plt.ylabel("L(rlu)")
+    plt.xlabel("K(rlu)")
+    plt.show(block=False)
 
 
 if __name__ == '__main__':
