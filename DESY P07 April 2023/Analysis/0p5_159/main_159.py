@@ -9,75 +9,72 @@ Created on Wed Jul 26 10:04:16 2023
 # fabians code
 
 import numpy as np
-
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
 import fabio as fabio
 import os.path
-import re
-import numpy as np
 from matplotlib.colors import LogNorm
-from matplotlib.pyplot import *
-from scipy.ndimage import center_of_mass
 
-
+############################################################
+# INPUT
 img = "0p5_159_H0L_0.5A_1.img"
-
-obj = fabio.open(img)
-NX = obj.header["NX"]
-NY = obj.header["NY"]
-data = obj.data
 resolution = 0.5
 lat_a = 4.3262
 lat_c = 10.996
+############################################################
+
+obj = fabio.open(img)
+data = obj.data
+NX = obj.header["NX"]
+NY = obj.header["NY"]
 qmaxa = lat_a/(resolution)
 qmaxc = lat_c/(resolution)
 
-qpixelx = 2*qmaxa/NX
-qpixely = 2*qmaxc/NY
+#  Momentum resolution in x and y
+qpixelx, qpixely = 2*qmaxa/NX, 2*qmaxc/NY
+print("qpixelx = {}, qpixely = {}".format(qpixelx, qpixely))
+
 qxrange = np.arange(-qpixelx*(NX/2.), qpixelx*(NX/2.), qpixelx)
 qyrange = np.arange(-qpixely*(NY/2.), qpixely*(NY/2.), qpixely)
-qx, qy = np.meshgrid(qxrange, qyrange)
+QX2d, QY2d = np.meshgrid(qxrange, qyrange)
+xlim_pos, xlim_neg, ylim_pos, ylim_neg = int(qmaxa), -int(qmaxa), int(qmaxc), -int(qmaxc)
 
-H = -5
-xlim, ylim = 0, 14
-ind_H = int(np.abs(H/qpixelx))# int(NX - np.abs(H/qpixelx))
-print("ind_H={}".format(ind_H))
+# LINECUTS
+fig = plt.figure(figsize=(10, 4))
+plt.title("{}".format(img))
+indices = np.arange(0, int(2*qmaxa + 1), 1) * int(1/qpixelx)
+for i in indices:
+    I = data[:, i]
+    plt.plot(qyrange, I , label='ind_H={}'.format(i), lw=0.5)
+    plt.xlabel('L (r.l.u.)')
+    plt.ylabel('Intensity I')
+    plt.xlim(xlim_neg, xlim_pos) 
+    plt.legend()
+#     plt.savefig("0p5_001_H0L_0.5A_Linecuts_H={}.jpg".format(H), dpi=300)
+
 # INTENSITY MAP
-fig,ax = plt.subplots(figsize=(9, 7))
-ax.vlines(x=H, ymin=-14, ymax=14, ls='-', lw=1.5, color='black')
-im = ax.pcolormesh(qx, qy, data,cmap='viridis',
-                   norm=LogNorm(vmin = 10, vmax = np.max(data)))
-ax.grid(True, which='both',axis='both',linestyle='-', color='black', lw=0.25)
-ax.set_yticks(np.arange(-ylim,ylim,1))
-ax.set_xticks(np.arange(xlim,0,1))
-ax.set_ylim([-ylim, ylim])
-ax.set_xlim([xlim, 0]) # qpixelx*(NX/2.)
-ax.set_xlabel('H (rlu)')
-ax.set_ylabel('L (rlu)')
-#ax.set_aspect('equal')
-fig.colorbar(im, ax=ax)
+plt.title("{}".format(img))
+fig = plt.figure(figsize=(4, 10))
+for i in range(-int(qmaxa), int(qmaxa), 1):
+    plt.vlines(x=i, ymin=ylim_neg, ymax=ylim_pos, ls='--', lw=0.2, color='tab:red')
+plt.imshow(data, cmap='viridis',
+                    norm = LogNorm(vmin=0.1, vmax=np.max(data)),
+                    extent=(qxrange[0], qxrange[-1], qyrange[0], qyrange[-1])
+                )
+plt.grid(True, which='both',axis='both',linestyle='-', color='black', lw=0.5)
+plt.yticks(np.arange(ylim_neg, ylim_pos, 1))
+plt.xticks(np.arange(xlim_neg, xlim_pos, 1))
+plt.ylim(int(ylim_neg), int(ylim_pos))
+plt.xlim(int(xlim_neg), int(xlim_pos)) 
+plt.xlabel('H (r.l.u.)')
+plt.ylabel('L (r.l.u.)')
+plt.colorbar()
+# plt.set_aspect('equal')
 # plt.savefig("0p5_159_H0L_0.5A.jpg", dpi=300)
 
 # plt.figure()
-# LINECUTS
-# figure(figsize=(15, 2), dpi=100)
-# for i in range(-61, -60, 1):
-#     I = data[:, ind_H+i]
-#     print("max(I)={}, ind={}, i={}".format(np.max(I), int(ind_H+i), i))
-#     plt.plot(qyrange, I , label='ind_H={}'.format(int(ind_H+i)), marker='.', 
-#              lw=1.5, ms=0.2)
-#     plt.xlabel('L (rlu)')
-#     plt.ylabel('Intensity I')
-#     plt.ylim(1)
-#     plt.title('H={}'.format(H))
-#     plt.ylim(1,0.5*np.max(I))
-#     plt.xlim(-ylim, ylim)
-#     plt.legend()
-#     plt.savefig("0p5_001_H0L_0.5A_Linecuts_H={}.jpg".format(H), dpi=300)
-
+plt.show()
 
 
 

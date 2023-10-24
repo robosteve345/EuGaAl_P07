@@ -280,7 +280,7 @@ def structurefactorandplotting(a, c, k0, l0, k2d, k, kmax, lmax, l2d, h, deltak,
         plt.ylabel(r"Intensity $I\propto F(\mathbf{Q})^2$")
         plt.xlabel("L(rlu)")
         if savefig == True:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/EuGaAl2_modulation1/{}UC_{}SC_A={}_q={}_H={}_center{}{}{}.jpg".format(n, int(n/int(q_cdw**(-1))), Amplitude, q_cdw, h, h, k0, l0), dpi=300)
+            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/EuGa2Al2_modulation1/{}UC_{}SC_A={}_q={}_H={}_center{}{}{}.jpg".format(n, int(n/int(q_cdw**(-1))), Amplitude, q_cdw, h, h, k0, l0), dpi=300)
         else:
             pass
         
