@@ -1,0 +1,2 @@
+a(Angstrom)	c(Angstrom)	resolution(1/Angstrom)
+4.3262		10.996		0.5
