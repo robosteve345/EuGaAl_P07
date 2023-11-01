@@ -8,13 +8,14 @@
 """
 
 import numpy as np
-import matplotlib
+import matplotlib as mpl
 import time
 import matplotlib.pyplot as plt
 from scipy import ndimage
 from matplotlib.colors import LogNorm
-matplotlib.rcParams['font.family'] = "sans-serif"
-matplotlib.rc('text', usetex=True)
+mpl.rc('text', usetex=True)
+mpl.rcParams.update(mpl.rcParamsDefault)
+mpl.rcParams['font.family'] = "sans-serif"
 from XRD_simulation_functions import kspacecreator, excludekspacepoints, debyewallerfactor
 from XRD_simulation_functions import atomicformfactorBCC
 
@@ -122,9 +123,8 @@ def structurefactorandplotting(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, h,
     plt.suptitle("BCC, Centered around [{} {} {}]".format(h, k0, l0))
     """MODULATED ATOMIC POSITIONS"""
     plt.subplot(2, 1, 1)
-    print("# one_directionxy = {}".format(len(one_directionxy)))
-    print("# one_directionz = {}".format(len(one_directionz)))
-    print(len(Atom2[2,:]))
+    # print("# one_directionxy = {}".format(len(one_directionxy)))
+    # print("# one_directionz = {}".format(len(one_directionz)))
     plt.scatter(1 / 2 * np.ones(len(one_directionz)) + one_directionz, np.ones(len(one_directionz)),
                 label=r'Atom2=$(\frac{1}{2},\frac{1}{2},\frac{1}{2})$ equilibrium', facecolors='none',
                 edgecolors='orange', s=100)

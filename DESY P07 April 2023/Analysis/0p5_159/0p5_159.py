@@ -1,63 +1,99 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#Created on Wed Jul 26 10:04:16 2023
+
+#@author: stevengebel
+"""Visualization of integrated Intensity maps with linecutting for I4/mmm Eu(Ga,Al)4
+
+Input: .txt-file with lattice parameters a,c and resolution of integrated maps
+Output: Visualtion of the intensity and linecuts
+
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 import fabio as fabio
-import os.path
-import re
-import numpy as np
+import matplotlib as mpl
+mpl.rc('text', usetex=True)
+mpl.rcParams.update(mpl.rcParamsDefault)
+mpl.rcParams['font.family'] = "sans-serif"
+import os
 from matplotlib.colors import LogNorm
-from matplotlib.pyplot import *
-matplotlib.rcParams['font.family'] = "sans-serif"
-matplotlib.rcParams['pcolor.shading']
-matplotlib.rcParams['text.usetex'] = False
 
-"""Print unwarped CrysAlisPro intensity maps"""
+#########################################################################
+# INPUT
+img = "0p5_159_H0L_0.5A.img"
+lat_a, lat_c, resolution = np.loadtxt("0p5_159.txt", usecols=(0, 1, 2), 
+                                      skiprows=1, unpack=True)
+#########################################################################
+print(__doc__)
+print("Elements in this directory:{}".format(os.listdir()))
+obj = fabio.open(img)
+data = obj.data
+NX = obj.header["NX"]
+NY = obj.header["NY"]
+qmaxa, qmaxc = lat_a/(resolution), lat_c/(resolution)
 
-def imgplot(imgpath, resolution, lat_a, lat_c, ylim, title, xlim=0):
-    """
-    :input:
-    lat_a, lat_c: tetragonal unit cell parameters
-    resolution: resolution of the reciprocal space intensity maps
-    :return:
-    """
-    obj = fabio.open(imgpath)
-    NX = obj.header["NX"]
-    print("NX={}".format(NX))
-    NY = obj.header["NY"]
-    data = obj.data
-    qmaxa = lat_a / (resolution)
-    qmaxc = lat_c / (resolution)
-    qpixelx = 2 * qmaxa / NX
-    qpixely = 2 * qmaxc / NY
-    # qpixel = qmax/NX
-    qxrange = np.arange(-qpixelx * (NX / 2.), qpixelx * (NX / 2.), qpixelx)
-    qyrange = np.arange(-qpixely * (NY / 2.), qpixely * (NY / 2.), qpixely)
-    qx, qy = np.meshgrid(qxrange, qyrange)
-    # PLOTTING
-    fig, ax = plt.subplots(figsize=(9, 7))
-    cmap = cm.get_cmap("viridis")
-    im = ax.pcolormesh(qx, qy, data, cmap=cmap, shading='nearest',
-                       norm=LogNorm(vmin=1.1, vmax=np.max(data))
-                       )
-    ax.set_ylim([-ylim, ylim])
-    fig.suptitle("a={}, c={}".format(lat_a, lat_c))
-    ax.set_xlim([xlim, qpixelx * (NX / 2.)])
-    ax.set_xlabel("H (rlu)")
-    ax.set_ylabel("L (rlu)")
-    ax.grid(True, which='both', axis='both', linestyle='-', lw=1, color='red')
-    ax.set_yticks(np.arange(-ylim, ylim,1))
-    ax.set_xticks(np.arange(xlim,10,1))
-    fig.colorbar(im, ax=ax)
-    print("FILE: {}".format(title))
-    print("Resolution: {}, a={}Å, c={}Å".format(resolution, lat_a, lat_c))
-    plt.savefig("{}.jpg".format(title), dpi=300)
-    plt.show()
+#  Momentum resolution in x and y
+qpixelx, qpixely = 2*qmaxa/NX, 2*qmaxc/NY
+print("qpixelx(1/Angstrom) = {}, qpixely(1/Angstrom) = {}".format(qpixelx, qpixely))
+
+qxrange = np.arange(-qpixelx*(NX/2.), qpixelx*(NX/2.), qpixelx)
+qyrange = np.arange(-qpixely*(NY/2.), qpixely*(NY/2.), qpixely)
+QX2d, QY2d = np.meshgrid(qxrange, qyrange)
+xlim_pos, xlim_neg, ylim_pos, ylim_neg = int(qmaxa), -int(qmaxa), \
+                                         int(qmaxc), -int(qmaxc)
+
+# LINECUTS
+fig = plt.figure(figsize=(10, 4))
+plt.title("{}".format(img))
+# PIXELZAHL DES ERSTEN INTEGER-K-WERTES FÜR LINECUTS
+important = 63 # Für P07
+indices = np.arange(important, int(2*qmaxa)*int(1/qpixelx), int(1/qpixelx)) 
+
+for i in indices:
+    I = data[:, i]
+    plt.plot(qyrange, I, label='ind(H)={}, H={}'.format(i, 
+                            np.round(qxrange[i], 1)), lw=0.5)
+    plt.xlabel('L (r.l.u.)')
+    plt.ylabel('Intensity I')
+    plt.xlim(ylim_neg, ylim_pos) 
+    plt.legend()
+    #plt.savefig("{}_linecuts.jpg".format(img), dpi=300)
+    
 
 
-def main():
-    print(__doc__)
-    imgplot("0p5_159_H0L_0.5A_1.img", 0.5, 4.3262, 10.996, xlim=-1, ylim=14, title='0p5_159_H0L_0.5A_1')  #Process by iterating through given list with imgplot-function
-if __name__ == "__main__":
-    main()
+# INTENSITY MAP
+# Create additional noise for visibility reasons
+noise = np.abs(np.random.randn(NX, NY)) * 1
+data = noise + data
+fig = plt.figure(figsize=(4, 10))
+plt.title("{}".format(img))
+for i in range(-int(qmaxa), int(qmaxa) + 1, 1):
+    plt.vlines(x=i, ymin=ylim_neg, ymax=ylim_pos, ls='--', lw=0.2, color='tab:red')
+# =============================================================================
+# The problem is that bins with 0 can not be properly log normalized so they are 
+# flagged as 'bad', which are mapped to differently. The default behavior is to 
+# not draw anything on those pixels. You can also specify what color to draw 
+# pixels that are over or under the limits of the color map (the default is to 
+# draw them as the highest/lowest color).
+# =============================================================================
+plt.imshow(data, cmap='inferno_r',
+                    norm = LogNorm(vmin=0.1, vmax=np.max(data)),
+                    extent=(qxrange[0], qxrange[-1], qyrange[0], qyrange[-1])
+                )
+# plt.grid(True, which='both',axis='both',linestyle='-', color='black', lw=0.5)
+plt.yticks(np.arange(ylim_neg, ylim_pos + 1, 1))
+plt.xticks(np.arange(xlim_neg, xlim_pos + 1, 1))
+plt.ylim(int(ylim_neg), int(ylim_pos))
+plt.xlim(int(xlim_neg), int(xlim_pos)) 
+plt.xlabel('H (r.l.u.)')
+plt.ylabel('L (r.l.u.)')
+plt.colorbar()
+# plt.savefig("{}.jpg".format(img), dpi=300)
+
+
+plt.show(block=False)
+
 
 
