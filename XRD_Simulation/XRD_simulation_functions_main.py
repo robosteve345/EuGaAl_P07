@@ -32,11 +32,11 @@ besselorder = 1
 # =============================================================================
 
 def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H, 
-                               deltak, Unitary, u_list, kernelsize,
-                               q_cdw, Nsc, z0, A, B, 
-                               noiseamplitude, sigma, lognorm=False, 
-                               normalization=False, DBW=False, savefig=False,
-                               fatom=False, EuAl4=False):
+                                deltak, Unitary, u_list, kernelsize,
+                                q_cdw, Nsc, z0, A, B, 
+                                noiseamplitude, sigma, lognorm=False, 
+                                normalization=False, DBW=False, savefig=False,
+                                fatom=False, EuAl4=False, EuGa4=False):
     print("SIMULATION OF {}KL-MAP".format(H))
     print("Centered peak: [HKL] = [{}{}{}]".format(H, k0, l0))
     print("Modulation vector q_z = {}".format(q_cdw))
@@ -121,8 +121,8 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
             for j in range(1, besselorder + 1):
                 # Create a list of position arrays
                 position_arrays = [[posAl1, posAl1_T, posAl2, posAl2_T], 
-                                   [posGa1, posGa1_T, posGa2, posGa2_T], 
-                                   [posEu, posEu_T]]
+                                    [posGa1, posGa1_T, posGa2, posGa2_T], 
+                                    [posEu, posEu_T]]
                 # Iterate over the positions and apply the calculations
                 #  4d
                 for pos in position_arrays[0]:
@@ -172,8 +172,7 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
 # =============================================================================
     #  Crystal structure factor for each atom at each Wyckoff position with 
     #  respect to the tI symmtry +1/2 transl.
-    f_Eu, f_Ga, f_Al = fatom_calc_H0KL(H, k2d, l2d, Unitary, 
-                                              fatom, EuAl4)    
+    f_Eu, f_Ga, f_Al = fatom_calc_H0KL(H, k2d, l2d, Unitary, fatom, EuAl4, EuGa4)    
     F_Eu = np.zeros((len(k2d), len(k2d)), dtype=complex)
     F_Eu_T = np.zeros((len(k2d), len(k2d)), dtype=complex)
     F_Al1 = np.zeros((len(k2d), len(k2d)), dtype=complex)
@@ -230,19 +229,25 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
     plt.xlim(l0-kmax, l0+kmax)
     plt.ylabel("Intensity $I\propto F(\mathbf{Q})^2$")
     plt.xlabel("L (r.l.u.)") 
-    # if savefig == True:
-    #     if EuAl4 == True:
-    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300)
-    #     else:
-    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300)
-    # else:
-    #     pass
+    if savefig == True:
+        if EuAl4 == True:
+            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300, bbox_inches='tight')
+        else:
+            if EuGa4 == True:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa4_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300, bbox_inches='tight')
+            else:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300, bbox_inches='tight')
+    else:
+        pass
     
     fig = plt.figure()
     if EuAl4 == True:
-        plt.suptitle("EuAl4 I4/mmm, q={}rlu".format(q_cdw))
+        plt.suptitle("EuAl4 I4/mmm, q={}rlu, [{}KL]".format(q_cdw, H))
     else:
-        plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu".format(q_cdw))
+        if EuGa4 == True:
+            plt.suptitle("EuGa4 I4/mmm, q={}rlu, [{}KL]".format(q_cdw, H))
+        else:
+            plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [{}KL]".format(q_cdw, H))
     """CONVOLUTION"""
     plt.title(r"$|F(Q)|^2$-[{}KL]-map".format(H))
     x, y = np.linspace(-1, 1, kernelsize), np.linspace(-1, 1, kernelsize)
@@ -253,24 +258,27 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
     Iconv = Iconv + np.abs(np.random.randn(len(k), len(k))) * noiseamplitude 
     if lognorm == True:
         plt.imshow(Iconv, cmap=cmap, 
-                   extent=(k0-kmax,k0+kmax,l0-lmax,l0+lmax), 
-                   origin='lower',
-                   norm=LogNorm(vmin = 1, vmax = np.max(Iconv))
+                    extent=(k0-kmax,k0+kmax,l0-lmax,l0+lmax), 
+                    origin='lower',
+                    norm=LogNorm(vmin = 1, vmax = np.max(Iconv))
                 )
     else:
         plt.imshow(Iconv, cmap=cmap, 
-                   extent=(k0-kmax,k0+kmax,l0-lmax,l0+lmax), 
-                   origin='lower', 
-                   vmin=0, vmax = np.max(Iconv)
+                    extent=(k0-kmax,k0+kmax,l0-lmax,l0+lmax), 
+                    origin='lower', 
+                    vmin=0, vmax = np.max(Iconv)
                 )          
     plt.colorbar()
     plt.ylabel("L (r.l.u.)")
     plt.xlabel("K (r.l.u.)")   
     if savefig == True:
         if EuAl4 == True:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/{}KL_EuAl4_zmodulation_q={}_optimized.jpg".format(H, q_cdw), dpi=300)
+            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/{}KL_EuAl4_q={}_optimized.jpg".format(H, q_cdw), dpi=300, bbox_inches='tight')
         else:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/{}KL_EuGa2Al2_q={}_optimized.jpg".format(H, q_cdw), dpi=300)
+            if EuGa4 == True:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/{}KL_EuGa4_q={}_optimized.jpg".format(H, q_cdw), dpi=300, bbox_inches='tight')
+            else:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/{}KL_EuGa2Al2_q={}_optimized.jpg".format(H, q_cdw), dpi=300, bbox_inches='tight')
     else:
         pass
     # """3D ATOM PLOT"""
@@ -293,17 +301,17 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
     # ax.set_ylabel('Y')
     # ax.set_zlabel('Z')
     # plt.legend()
-    # plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/Structure_q={}.jpg".format(q_cdw), dpi=300)
+    # plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/Structure_q={}.jpg".format(q_cdw), dpi=300, bbox_inches='tight')
     plt.show(block=False)
     return Iconv
 
 
 def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K, 
-                               deltak, Unitary, u_list, kernelsize,
-                               q_cdw, Nsc, z0, A, B, 
-                               noiseamplitude, sigma, lognorm=False, 
-                               normalization=False, DBW=False, savefig=False,
-                               fatom=False, EuAl4=False):
+                                deltak, Unitary, u_list, kernelsize,
+                                q_cdw, Nsc, z0, A, B, 
+                                noiseamplitude, sigma, lognorm=False, 
+                                normalization=False, DBW=False, savefig=False,
+                                fatom=False, EuAl4=False, EuGa4=False):
     print("SIMULATION OF H{}L-MAP".format(K))
     print("Centered peak: [HKL] = [{}{}{}]".format(h0, K, l0))
     print("Modulation vector q_z = {}".format(q_cdw))
@@ -388,8 +396,8 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
             for j in range(1, besselorder + 1):
                 # Create a list of position arrays
                 position_arrays = [[posAl1, posAl1_T, posAl2, posAl2_T], 
-                                   [posGa1, posGa1_T, posGa2, posGa2_T], 
-                                   [posEu, posEu_T]]
+                                    [posGa1, posGa1_T, posGa2, posGa2_T], 
+                                    [posEu, posEu_T]]
                 # Iterate over the positions and apply the calculations
                 #  4d
                 for pos in position_arrays[0]:
@@ -486,32 +494,41 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
     if EuAl4 == True:
         plt.suptitle("EuAl4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
     else:
-        plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+        if EuGa4 == True:
+            plt.suptitle("EuGa4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+        else:
+            plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
     """LINECUTS"""
     h_indices = np.arange(0, int(2*hmax + 1), 1) * int(1/deltak)
     #  Only plot 1/4 of k-space, only plot for multiples of q_cdw in L
     for i in h_indices[len(h_indices) // 2:-int(len(h_indices)/4)]:
-        plt.plot(l, I[:, i], ls='-', lw=0.5 , marker='x', 
-                  ms=0.5, label='H={}'.format(np.round(h[i], 1)))
+        plt.plot(l, I[:, i], ls='-', lw=0.5 , marker='s', 
+                  ms=2, label='H={}'.format(np.round(h[i], 1)))
     plt.legend()
-    plt.xlim(h0-hmax, h0+hmax)
+    plt.xlim(l0-lmax, l0+lmax)
     plt.ylabel("Intensity $I\propto F(\mathbf{Q})^2$")
     plt.xlabel("L (r.l.u.)") 
-    # if savefig == True:
-    #     if EuAl4 == True:
-    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300)
-    #     else:
-    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300)
-    # else:
-    #     pass
-    
-    fig = plt.figure()
-    if EuAl4 == True:
-        plt.suptitle("EuAl4 I4/mmm, q={}rlu".format(q_cdw))
+    if savefig == True:
+        if EuAl4 == True:
+            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300)
+        else:
+            if EuGa4 == True:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa4_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300, bbox_inches='tight')
+            else:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300, bbox_inches='tight')
     else:
-        plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu".format(q_cdw))
+        pass
+    
+    fig = plt.figure()  
+    if EuAl4 == True:
+        plt.suptitle("EuAl4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+    else:
+        if EuGa4 == True:
+            plt.suptitle("EuGa4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+        else:
+            plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
     """CONVOLUTION"""
-    plt.title(r"$|F(Q)|^2$-[H{}L]-map".format(K))
+    plt.title("[H{}L], q={}rlu".format(K, q_cdw))
     x, y = np.linspace(-1, 1, kernelsize), np.linspace(-1, 1, kernelsize)
     X, Y = np.meshgrid(x, y)     
     kernel = 1/(2*np.pi*sigma**2)*np.exp(-(X**2+Y**2)/(2*sigma**2)) 
@@ -520,9 +537,9 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
     Iconv = Iconv + np.abs(np.random.randn(len(h), len(h))) * noiseamplitude 
     if lognorm == True:
         plt.imshow(Iconv, cmap=cmap, 
-                   extent=(h0-hmax,h0+hmax,l0-lmax,l0+lmax), 
-                   origin='lower',
-                   norm=LogNorm(vmin = 1, vmax = np.max(Iconv))
+                   extent=(h0-hmax,h0+hmax,l0-lmax,l0+lmax),
+                   origin='lower', aspect='auto',
+                   norm=LogNorm(vmin=1, vmax=np.max(Iconv))
                 )
     else:
         plt.imshow(Iconv, cmap=cmap, 
@@ -531,13 +548,18 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
                    vmin=0, vmax = np.max(Iconv)
                 )          
     plt.colorbar()
-    plt.ylabel("L (r.l.u.)")
+    # plt.xlim(2, 8)     
+    # plt.ylim(-13, 8)    
+    plt.ylabel("L (r.l.u.)")      
     plt.xlabel("H (r.l.u.)")   
     if savefig == True:
         if EuAl4 == True:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuAl4_zmodulation_q={}_optimized.jpg".format(K, q_cdw), dpi=300)
+            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuAl4_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
         else:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuGa2Al2_q={}_optimized.jpg".format(K, q_cdw), dpi=300)
+            if EuGa4 == True:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuGa4_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
+            else:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuGa2Al2_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
     else:
         pass
     # """3D ATOM PLOT"""
@@ -566,11 +588,11 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
 
 
 def main_HKL0(a, c, h0, k0, h2d, h, k, hmax, kmax, k2d, L, 
-                               deltak, Unitary, u_list, kernelsize,
-                               q_cdw, Nsc, z0, A, B, 
-                               noiseamplitude, sigma, lognorm=False, 
-                               normalization=False, DBW=False, savefig=False,
-                               fatom=False, EuAl4=False):
+                                deltak, Unitary, u_list, kernelsize,
+                                q_cdw, Nsc, z0, A, B, 
+                                noiseamplitude, sigma, lognorm=False, 
+                                normalization=False, DBW=False, savefig=False,
+                                fatom=False, EuAl4=False, EuGa4=False):
     print("SIMULATION OF HK{}-MAP".format(L))
     print("Centered peak: [HKL] = [{}{}{}]".format(h0, k0, L))
     print("Modulation vector q_z = {}".format(q_cdw))
@@ -653,8 +675,8 @@ def main_HKL0(a, c, h0, k0, h2d, h, k, hmax, kmax, k2d, L,
             for j in range(1, besselorder + 1):
                 # Create a list of position arrays
                 position_arrays = [[posAl1, posAl1_T, posAl2, posAl2_T], 
-                                   [posGa1, posGa1_T, posGa2, posGa2_T], 
-                                   [posEu, posEu_T]]
+                                    [posGa1, posGa1_T, posGa2, posGa2_T], 
+                                    [posEu, posEu_T]]
                 # Iterate over the positions and apply the calculations
                 #  4d
                 for pos in position_arrays[0]:
@@ -763,17 +785,20 @@ def main_HKL0(a, c, h0, k0, h2d, h, k, hmax, kmax, k2d, L,
     plt.xlabel("L (r.l.u.)") 
     # if savefig == True:
     #     if EuAl4 == True:
-    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300)
+    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300, bbox_inches='tight')
     #     else:
-    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300)
+    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_H={}_center{}{}{}_optimized.jpg".format(q_cdw, H, H, k0, l0), dpi=300, bbox_inches='tight')
     # else:
     #     pass
     
     fig = plt.figure()
     if EuAl4 == True:
-        plt.suptitle("EuAl4 I4/mmm, q={}rlu".format(q_cdw))
+        plt.suptitle("EuAl4 I4/mmm, q={}rlu, [HK{}]".format(q_cdw, L))
     else:
-        plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu".format(q_cdw))
+        if EuGa4 == True:
+            plt.suptitle("EuGa4 I4/mmm, q={}rlu, [HK{}]".format(q_cdw, L))
+        else:
+            plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [HK{}]".format(q_cdw, L))
     """CONVOLUTION"""
     plt.title(r"$|F(Q)|^2$-[HK{}]-map".format(L))
     x, y = np.linspace(-1, 1, kernelsize), np.linspace(-1, 1, kernelsize)
@@ -784,24 +809,28 @@ def main_HKL0(a, c, h0, k0, h2d, h, k, hmax, kmax, k2d, L,
     Iconv = Iconv + np.abs(np.random.randn(len(h), len(h))) * noiseamplitude 
     if lognorm == True:
         plt.imshow(Iconv, cmap=cmap, 
-                   extent=(h0-hmax,h0+hmax,k0-kmax,k0+kmax), 
-                   origin='lower',
-                   norm=LogNorm(vmin = 1, vmax = np.max(Iconv))
+                    extent=(-8.7722, 8.7722, -22.33, 22.33), #h0-hmax,h0+hmax,k0-kmax,k0+kmax
+                    origin='lower', aspect=0.5/1.0,
+                    norm=LogNorm(vmin = 1, vmax = np.max(Iconv))
                 )
     else:
         plt.imshow(Iconv, cmap=cmap, 
-                   extent=(h0-hmax,h0+hmax,k0-kmax,k0+kmax), 
-                   origin='lower', 
-                   vmin=0, vmax = np.max(Iconv)
+                    extent=(h0-hmax,h0+hmax,k0-kmax,k0+kmax), 
+                    origin='lower', 
+                    vmin=0, vmax = np.max(Iconv)
                 )          
     plt.colorbar()
+    # plt.xlim(-5, 5)
     plt.ylabel("K (r.l.u.)")
     plt.xlabel("H (r.l.u.)")   
     if savefig == True:
         if EuAl4 == True:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/HK{}_EuAl4_zmodulation_q={}_optimized.jpg".format(L, q_cdw), dpi=300)
+            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/HK{}_EuAl4_q={}_optimized.jpg".format(L, q_cdw), dpi=300)
         else:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/HK{}_EuGa2Al2_q={}_optimized.jpg".format(L, q_cdw), dpi=300)
+            if EuGa4 == True:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/HK{}_EuAl4_q={}_optimized.jpg".format(L, q_cdw), dpi=300, bbox_inches='tight')
+            else:
+                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/HK{}_EuGa2Al2_q={}_optimized.jpg".format(L, q_cdw), dpi=300, bbox_inches='tight')
     else:
         pass
     # """3D ATOM PLOT"""

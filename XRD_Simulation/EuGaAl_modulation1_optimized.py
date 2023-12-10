@@ -13,7 +13,7 @@ for Eu(Ga,Al)4 in I4/mmm symmetry"""
 
 import numpy as np
 import time
-from XRD_simulation_functions_main import main_HKL0, main_HK0L, main_H0KL
+from XRD_simulation_functions_main import main_HK0L, main_H0KL, main_HKL0
 from XRD_simulation_functions import kspacecreator
 
 def main():
@@ -21,8 +21,8 @@ def main():
 #     ########################## GENERAL INPUT ################################
 # =============================================================================
     print(__doc__)
-    deltak = 0.01  # k-space point distance
-    a, c, z0 = 4.3949, 11.1607, 0.3849  # Unit Cell Parameters in Angstrom
+    deltak = 0.02  # k-space point distance
+    a, c, z0 = 4.3861, 11.165, 0.3849	# 4.3949, 11.1607, 0.3849  # Unit Cell Parameters in Angstrom
     ######################################
     #  INPUT FOR CDW
     q_cdw = 0.1
@@ -52,7 +52,7 @@ def main():
     #       1/c*np.array([0, 0, 0])]
     ######################################
     #  INPUT FOR DBW
-    u_list = [0.057, 0.060, 0.053]  # Isotropic displacements <u^2> in Å^2.
+    u_list = [0.057, 0.60, 0.53]  # Isotropic displacements <u^2> in Å^2.
     ######################################
     # OTHER
     noiseamplitude = 1  # Noise amplitude
@@ -61,16 +61,16 @@ def main():
 #     # ID28: qpixelx= |
 #     # P07:  qpixelx= |
 # =============================================================================
-    sigma, kernelsize = 0.2, 10
+    sigma, kernelsize = 0.1, 10
     
     
 # =============================================================================
 #     #  PROGRAM: 
 # =============================================================================    
-    # # KL MAP
-    k0, l0, kmax, lmax = 0, 0, 5, 5  # boundaries of K and L 
-    H = -9 # H value in k space
     st = time.time()
+    # # KL MAP
+    k0, l0, kmax, lmax = 0, 0, 10, 10  # boundaries of K and L 
+    H = 1 # H value in k space
     k2d, l2d, k, l, Unitary = kspacecreator(k0, l0, kmax, lmax, deltak) 
     main_H0KL(a, c, k0, l0, k2d, k, l, lmax, lmax, l2d, H, deltak, 
                         Unitary, u_list, kernelsize, q_cdw, Nsc, z0, A, B, 
@@ -80,8 +80,32 @@ def main():
                         lognorm=True, 
                         savefig=True,
                         fatom=True, 
-                        EuAl4=True)
-    # # # HK MAP
+                        EuAl4=False, 
+                        EuGa4=True
+                        )
+    main_H0KL(a, c, k0, l0, k2d, k, l, lmax, lmax, l2d, H, deltak, 
+                        Unitary, u_list, kernelsize, q_cdw, Nsc, z0, A, B, 
+                        noiseamplitude, sigma,
+                        normalization=False, 
+                        DBW=True, 
+                        lognorm=True, 
+                        savefig=True,
+                        fatom=True, 
+                        EuAl4=False, 
+                        EuGa4=False
+                        )
+    main_H0KL(a, c, k0, l0, k2d, k, l, lmax, lmax, l2d, H, deltak, 
+                        Unitary, u_list, kernelsize, q_cdw, Nsc, z0, A, B, 
+                        noiseamplitude, sigma,
+                        normalization=False, 
+                        DBW=True, 
+                        lognorm=True, 
+                        savefig=True,
+                        fatom=True, 
+                        EuAl4=True, 
+                        EuGa4=False
+                        )
+    # # # # HK MAP
     # h0, k0, hmax, kmax = 0, 0, 5, 5  # boundaries of K and L 
     # L = 1  # L value in k space
     # h2d, k2d, h, k, Unitary = kspacecreator(h0, k0, hmax, kmax, deltak)
@@ -93,21 +117,24 @@ def main():
     #                     lognorm=True, 
     #                     savefig=True,
     #                     fatom=True, 
-    #                     EuAl4=True
+    #                     EuAl4=False, 
+    #                     EuGa4=True
     #                     )   
-    # # HL MAP
-    h0, l0, hmax, lmax = 0, 0, 5, 5  # boundaries of K and L 
-    K = -8  # K value in k space
-    h2d, l2d, h, l, Unitary = kspacecreator(h0, l0, hmax, lmax, deltak)
-    main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K, deltak, 
-                        Unitary, u_list, kernelsize, q_cdw, Nsc, z0, A, B, 
-                        noiseamplitude, sigma,
-                        normalization=False, 
-                        DBW=True, 
-                        lognorm=True, 
-                        savefig=True,
-                        fatom=True, 
-                        EuAl4=True)
+    # # # HL MAP
+    # h0, l0, hmax, lmax = 0, 0, 5, 5 # boundaries of K and L 
+    # K = 0  # K value in k space
+    # h2d, l2d, h, l, Unitary = kspacecreator(h0, l0, hmax, lmax, deltak)
+    # main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K, deltak, 
+    #                     Unitary, u_list, kernelsize, q_cdw, Nsc, z0, A, B, 
+    #                     noiseamplitude, sigma,
+    #                     normalization=False, 
+    #                     DBW=True, 
+    #                     lognorm=True, 
+    #                     savefig=True,
+    #                     fatom=True, 
+    #                     EuAl4=False, 
+    #                     EuGa4=True
+    #                     )
     et = time.time()
     elapsed_time = et - st
     print('Execution time:', elapsed_time, 'seconds')

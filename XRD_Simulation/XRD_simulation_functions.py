@@ -89,7 +89,18 @@ def excludekspacepoints_HKmap(x2d, y2d, deltak, I, xmax, ymax):
     return I, x_indices
 
 
-def fatom_calc_H0KL(H, k2d, l2d, Unitary, fatom=False, EuAl4=False):
+def fatom_calc_H0KL(H, k2d, l2d, Unitary, fatom=False, EuAl4=False, EuGa4=False):
+    if fatom == True:
+            a_eu, a_ga, a_al  = [24.0063, 19.9504, 11.8034, 3.87243], \
+            [15.2354, 6.7006, 4.3591, 2.9623], [4.17448, 3.3876, 1.20296, 0.528137]
+            b_eu, b_ga, b_al = [2.27783, 0.17353, 11.6096, 26.5156], \
+            [3.0669, 0.2412, 10.7805, 61.4135], [1.93816, 4.14553, 0.228753, 8.28524]
+            c_eu, c_ga, c_al = 1.36389, 1.7189, 0.706786
+    else:
+        # Make f_eu,f_ga,f_al trivial (1)
+        a_eu, a_ga, a_al  = np.ones(4), np.ones(4), np.ones(4)
+        b_eu, b_ga, b_al =  np.zeros(4), np.zeros(4), np.zeros(4)
+        c_eu, c_ga, c_al = 0, 0, 0
     if EuAl4 == True:
         ######################################################################
         # EMPIRIC FACTORS
@@ -111,33 +122,46 @@ def fatom_calc_H0KL(H, k2d, l2d, Unitary, fatom=False, EuAl4=False):
         f_al4 = a_al[3] * np.exp(- b_al[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
         f_Al = f_al1 + f_al2 + f_al3 + f_al4 + c_al * Unitary
         f_Ga = f_Al
+        
     else:
-        if fatom == True:
+        if EuGa4 == True:
+            ######################################################################
+            # EMPIRIC FACTORS
             a_eu, a_ga, a_al  = [24.0063, 19.9504, 11.8034, 3.87243], \
-            [15.2354, 6.7006, 4.3591, 2.9623], [4.17448, 3.3876, 1.20296, 0.528137]
+                [15.2354, 6.7006, 4.3591, 2.9623], [4.17448, 3.3876, 1.20296, 0.528137]
             b_eu, b_ga, b_al = [2.27783, 0.17353, 11.6096, 26.5156], \
-            [3.0669, 0.2412, 10.7805, 61.4135], [1.93816, 4.14553, 0.228753, 8.28524]
+                    [3.0669, 0.2412, 10.7805, 61.4135], [1.93816, 4.14553, 0.228753, 8.28524]
             c_eu, c_ga, c_al = 1.36389, 1.7189, 0.706786
+            ######################################################################
+            
+            f_eu1 = a_eu[0] * np.exp(- b_eu[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))  
+            f_eu2 = a_eu[1] * np.exp(- b_eu[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_eu3 = a_eu[2] * np.exp(- b_eu[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_eu4 = a_eu[3] * np.exp(- b_eu[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_Eu = f_eu1+f_eu2+f_eu3+f_eu4 + c_eu * Unitary
+            f_ga1 = a_ga[0] * np.exp(- b_ga[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_ga2 = a_ga[1] * np.exp(- b_ga[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_ga3 = a_ga[2] * np.exp(- b_ga[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_ga4 = a_ga[3] * np.exp(- b_ga[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_Ga = f_ga1 + f_ga2 + f_ga3 + f_ga4 + c_ga * Unitary
+            f_Al = f_Ga
+    
         else:
-            # Make f_eu,f_ga,f_al trivial (1)
-            a_eu, a_ga, a_al  = np.ones(4), np.ones(4), np.ones(4)
-            b_eu, b_ga, b_al =  np.zeros(4), np.zeros(4), np.zeros(4)
-            c_eu, c_ga, c_al = 0, 0, 0
-        f_eu1 = a_eu[0] * np.exp(- b_eu[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_eu2 = a_eu[1] * np.exp(- b_eu[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_eu3 = a_eu[2] * np.exp(- b_eu[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_eu4 = a_eu[3] * np.exp(- b_eu[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_Eu = f_eu1 + f_eu2 + f_eu3 + f_eu4 + c_eu * Unitary
-        f_ga1 = a_ga[0] * np.exp(- b_ga[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_ga2 = a_ga[1] * np.exp(- b_ga[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_ga3 = a_ga[2] * np.exp(- b_ga[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_ga4 = a_ga[3] * np.exp(- b_ga[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_Ga = f_ga1 + f_ga2 + f_ga3 + f_ga4 + c_ga * Unitary
-        f_al1 = a_al[0] * np.exp(- b_al[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_al2 = a_al[1] * np.exp(- b_al[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_al3 = a_al[2] * np.exp(- b_al[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_al4 = a_al[3] * np.exp(- b_al[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
-        f_Al = f_al1 + f_al2 + f_al3 + f_al4 + c_al * Unitary      
+            f_eu1 = a_eu[0] * np.exp(- b_eu[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_eu2 = a_eu[1] * np.exp(- b_eu[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_eu3 = a_eu[2] * np.exp(- b_eu[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_eu4 = a_eu[3] * np.exp(- b_eu[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_Eu = f_eu1 + f_eu2 + f_eu3 + f_eu4 + c_eu * Unitary
+            f_ga1 = a_ga[0] * np.exp(- b_ga[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_ga2 = a_ga[1] * np.exp(- b_ga[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_ga3 = a_ga[2] * np.exp(- b_ga[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_ga4 = a_ga[3] * np.exp(- b_ga[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_Ga = f_ga1 + f_ga2 + f_ga3 + f_ga4 + c_ga * Unitary
+            f_al1 = a_al[0] * np.exp(- b_al[0] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_al2 = a_al[1] * np.exp(- b_al[1] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_al3 = a_al[2] * np.exp(- b_al[2] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_al4 = a_al[3] * np.exp(- b_al[3] * (((H * Unitary) ** 2 + k2d ** 2 + l2d ** 2) / (4 * np.pi) ** 2))
+            f_Al = f_al1 + f_al2 + f_al3 + f_al4 + c_al * Unitary 
     return f_Eu, f_Ga, f_Al
 
 
