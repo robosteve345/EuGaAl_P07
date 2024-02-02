@@ -43,11 +43,23 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
     print("Resolution in x and y: {}r.l.u.".format(deltak))
     print("H = {}, K, L in {} to {}".format(H, -kmax, kmax))
     """Nominal atomic positions"""
-    # Europium Z=63:
+    # # Europium Z=63:
+    # x_Eu, y_Eu, z_Eu = 0, 0, 0
+    # #  Aluminium, Z=13:
+    # x_Al1, y_Al1, z_Al1 = 0, 0.5, 0.25
+    # x_Al2, y_Al2, z_Al2 = 0.5, 0, 0.25
+    # #  Gallium, Z=31:
+    # x_Ga1, y_Ga1, z_Ga1 = 0, 0, z0
+    # x_Ga2, y_Ga2, z_Ga2 = 0, 0, -z0
+# =============================================================================
+#     
+# =============================================================================
+    # Immm No. 71
+    # Europium Z=63, 2a:
     x_Eu, y_Eu, z_Eu = 0, 0, 0
-    #  Aluminium, Z=13:
-    x_Al1, y_Al1, z_Al1 = 0, 0.5, 0.25
-    x_Al2, y_Al2, z_Al2 = 0.5, 0, 0.25
+    #  Aluminium, Z=13, 4j:
+    x_Al1, y_Al1, z_Al1 = 0, 0.5, 0.254
+    x_Al2, y_Al2, z_Al2 = 0, 0.5, -0.254
     #  Gallium, Z=31:
     x_Ga1, y_Ga1, z_Ga1 = 0, 0, z0
     x_Ga2, y_Ga2, z_Ga2 = 0, 0, -z0
@@ -58,7 +70,7 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
     """Atomic positions"""
     ##########################################################################
     Nxy_neg, Nxy_pos = 0, 1  #int(np.sqrt(Nsc/(q_cdw*0.3)))
-    Nz_neg, Nz_pos = 0, int(q_cdw**(-1)) * Nsc
+    Nz_neg, Nz_pos = 0, 1# int(q_cdw**(-1)) * Nsc
     ##########################################################################
     # Europium
     init_Eu_x = np.arange(Nxy_neg + x_Eu, Nxy_pos + x_Eu, 1.0)
@@ -281,27 +293,27 @@ def main_H0KL(a, c, k0, l0, k2d, k, l, kmax, lmax, l2d, H,
                 plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/{}KL_EuGa2Al2_q={}_optimized.jpg".format(H, q_cdw), dpi=300, bbox_inches='tight')
     else:
         pass
-    # """3D ATOM PLOT"""
-    # fig = plt.figure()
-    # ax = fig.add_subplot(projection='3d')
-    # # ax.title("Supercell with Wyckoff 4e z-parameter z0={}".format(z0))
-    # # ax.scatter(Eu[0], Eu[1], Eu[2], label='2a (000)', c='yellow')
-    # # ax.scatter(Eu_T[0], Eu_T[1], Eu_T[2], label='2a T(000)', facecolors='none', edgecolors='yellow')
-    # ax.scatter(Al1[0], Al1[1], Al1[2], label='4d (1/2 0 1/4), (0 1/2 1/4)', c='blue')
-    # ax.scatter(Al1_T[0], Al1_T[1], Al1_T[2], facecolors='none', edgecolors='blue')
-    # ax.scatter(Al2[0], Al2[1], Al2[2], c='blue')
-    # ax.scatter(Al2_T[0], Al2_T[1], Al2_T[2], facecolors='none', edgecolors='blue')
-    # ax.scatter(Ga1[0], Ga1[1], Ga1[2], label='4e (0 0 z0), (0 0 -z0)', c='green')
-    # ax.scatter(Ga1_T[0], Ga1_T[1], Ga1_T[2], facecolors='none', edgecolors='green')
-    # ax.scatter(Ga2[0], Ga2[1], Ga2[2], c='green')
-    # ax.scatter(Ga2_T[0], Ga2_T[1], Ga2_T[2], facecolors='none', edgecolors='green')
-    # # ax.set_xlim(-0.5, 1.5)
-    # # ax.set_ylim(-0.5, 1.5)
-    # ax.set_xlabel('X')
-    # ax.set_ylabel('Y')
-    # ax.set_zlabel('Z')
-    # plt.legend()
-    # plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/Structure_q={}.jpg".format(q_cdw), dpi=300, bbox_inches='tight')
+    """3D ATOM PLOT"""
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    # ax.title("Supercell with Wyckoff 4e z-parameter z0={}".format(z0))
+    ax.scatter(Eu[0], Eu[1], Eu[2], label='2a (000)', c='yellow')
+    ax.scatter(Eu_T[0], Eu_T[1], Eu_T[2], label='2a T(000)', facecolors='none', edgecolors='yellow')
+    ax.scatter(Al1[0], Al1[1], Al1[2], label='4d (1/2 0 1/4), (0 1/2 1/4)', c='blue')
+    ax.scatter(Al1_T[0], Al1_T[1], Al1_T[2], facecolors='none', edgecolors='blue')
+    ax.scatter(Al2[0], Al2[1], Al2[2], c='blue')
+    ax.scatter(Al2_T[0], Al2_T[1], Al2_T[2], facecolors='none', edgecolors='blue')
+    ax.scatter(Ga1[0], Ga1[1], Ga1[2], label='4e (0 0 z0), (0 0 -z0)', c='green')
+    ax.scatter(Ga1_T[0], Ga1_T[1], Ga1_T[2], facecolors='none', edgecolors='green')
+    ax.scatter(Ga2[0], Ga2[1], Ga2[2], c='green')
+    ax.scatter(Ga2_T[0], Ga2_T[1], Ga2_T[2], facecolors='none', edgecolors='green')
+    # ax.set_xlim(-0.5, 1.5)
+    # ax.set_ylim(-0.5, 1.5)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.legend()
+    plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/1412_Structure_q={}.jpg".format(q_cdw), dpi=300, bbox_inches='tight')
     plt.show(block=False)
     return Iconv
 
@@ -318,12 +330,21 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
     print("Resolution in x and y: {}r.l.u.".format(deltak))
     print("K = {}, H, L in {} to {}".format(K, -hmax, hmax))
     """Nominal atomic positions"""
-    # Europium Z=63:
+    # # Europium Z=63:
+    # x_Eu, y_Eu, z_Eu = 0, 0, 0
+    # #  Aluminium, Z=13:
+    # x_Al1, y_Al1, z_Al1 = 0, 0.5, 0.25
+    # x_Al2, y_Al2, z_Al2 = 0.5, 0, 0.25
+    # #  Gallium, Z=31:
+    # x_Ga1, y_Ga1, z_Ga1 = 0, 0, z0
+    # x_Ga2, y_Ga2, z_Ga2 = 0, 0, -z0
+    # Immm No. 71
+    # Europium Z=63, 2a:
     x_Eu, y_Eu, z_Eu = 0, 0, 0
-    #  Aluminium, Z=13:
-    x_Al1, y_Al1, z_Al1 = 0, 0.5, 0.25
-    x_Al2, y_Al2, z_Al2 = 0.5, 0, 0.25
-    #  Gallium, Z=31:
+    #  Aluminium, Z=13, 4j:
+    x_Al1, y_Al1, z_Al1 = 0, 0.5, 0.254
+    x_Al2, y_Al2, z_Al2 = 0, 0.5, -0.254
+    #  Gallium, Z=31, 4i:
     x_Ga1, y_Ga1, z_Ga1 = 0, 0, z0
     x_Ga2, y_Ga2, z_Ga2 = 0, 0, -z0
     print("DBW-Factor = {}".format(DBW))
@@ -332,8 +353,8 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
     
     """Atomic positions"""
     ##########################################################################
-    Nxy_neg, Nxy_pos = 0, 1  #int(np.sqrt(Nsc/(q_cdw*0.3)))
-    Nz_neg, Nz_pos = 0, int(q_cdw**(-1)) * Nsc
+    Nxy_neg, Nxy_pos = 0, 2  #int(np.sqrt(Nsc/(q_cdw*0.3)))
+    Nz_neg, Nz_pos = 0, 5 #int(q_cdw**(-1)) * Nsc
     ##########################################################################
     # Europium
     init_Eu_x = np.arange(Nxy_neg + x_Eu, Nxy_pos + x_Eu, 1.0)
@@ -490,101 +511,170 @@ def main_HK0L(a, c, h0, l0, h2d, h, l, hmax, lmax, l2d, K,
 # =============================================================================
 #     # PLOTTING
 # =============================================================================
-    fig = plt.figure(figsize=(8, 3))
-    if EuAl4 == True:
-        plt.suptitle("EuAl4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
-    else:
-        if EuGa4 == True:
-            plt.suptitle("EuGa4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
-        else:
-            plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
-    """LINECUTS"""
-    h_indices = np.arange(0, int(2*hmax + 1), 1) * int(1/deltak)
-    #  Only plot 1/4 of k-space, only plot for multiples of q_cdw in L
-    for i in h_indices[len(h_indices) // 2:-int(len(h_indices)/4)]:
-        plt.plot(l, I[:, i], ls='-', lw=0.5 , marker='s', 
-                  ms=2, label='H={}'.format(np.round(h[i], 1)))
-    plt.legend()
-    plt.xlim(l0-lmax, l0+lmax)
-    plt.ylabel("Intensity $I\propto F(\mathbf{Q})^2$")
-    plt.xlabel("L (r.l.u.)") 
-    if savefig == True:
-        if EuAl4 == True:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300)
-        else:
-            if EuGa4 == True:
-                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa4_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300, bbox_inches='tight')
-            else:
-                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300, bbox_inches='tight')
-    else:
-        pass
+    # fig = plt.figure(figsize=(8, 3))
+    # if EuAl4 == True:
+    #     plt.suptitle("EuAl4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+    # else:
+    #     if EuGa4 == True:
+    #         plt.suptitle("EuGa4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+    #     else:
+    #         plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+    # """LINECUTS"""
+    # h_indices = np.arange(0, int(2*hmax + 1), 1) * int(1/deltak)
+    # #  Only plot 1/4 of k-space, only plot for multiples of q_cdw in L
+    # for i in h_indices[len(h_indices) // 2:-int(len(h_indices)/4)]:
+    #     plt.plot(l, I[:, i], ls='-', lw=0.5 , marker='s', 
+    #               ms=2, label='H={}'.format(np.round(h[i], 1)))
+    # plt.legend()
+    # plt.xlim(l0-lmax, l0+lmax)
+    # plt.ylabel("Intensity $I\propto F(\mathbf{Q})^2$")
+    # plt.xlabel("L (r.l.u.)") 
+    # if savefig == True:
+    #     if EuAl4 == True:
+    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuAl4_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300)
+    #     else:
+    #         if EuGa4 == True:
+    #             plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa4_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300, bbox_inches='tight')
+    #         else:
+    #             plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/L-cuts_EuGa2Al2_q={}_K={}_center{}{}{}_optimized.jpg".format(q_cdw, K, h0, K, l0), dpi=300, bbox_inches='tight')
+    # else:
+    #     pass
     
-    fig = plt.figure()  
-    if EuAl4 == True:
-        plt.suptitle("EuAl4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
-    else:
-        if EuGa4 == True:
-            plt.suptitle("EuGa4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
-        else:
-            plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
-    """CONVOLUTION"""
-    plt.title("[H{}L], q={}rlu".format(K, q_cdw))
-    x, y = np.linspace(-1, 1, kernelsize), np.linspace(-1, 1, kernelsize)
-    X, Y = np.meshgrid(x, y)     
-    kernel = 1/(2*np.pi*sigma**2)*np.exp(-(X**2+Y**2)/(2*sigma**2)) 
-    Iconv = ndimage.convolve(I, kernel, mode='constant', cval=0.0)
-    # Add noise
-    Iconv = Iconv + np.abs(np.random.randn(len(h), len(h))) * noiseamplitude 
-    if lognorm == True:
-        plt.imshow(Iconv, cmap=cmap, 
-                   extent=(h0-hmax,h0+hmax,l0-lmax,l0+lmax),
-                   origin='lower', aspect='auto',
-                   norm=LogNorm(vmin=1, vmax=np.max(Iconv))
-                )
-    else:
-        plt.imshow(Iconv, cmap=cmap, 
-                   extent=(h0-hmax,h0+hmax,l0-lmax,l0+lmax), 
-                   origin='lower', 
-                   vmin=0, vmax = np.max(Iconv)
-                )          
-    plt.colorbar()
-    # plt.xlim(2, 8)     
-    # plt.ylim(-13, 8)    
-    plt.ylabel("L (r.l.u.)")      
-    plt.xlabel("H (r.l.u.)")   
-    if savefig == True:
-        if EuAl4 == True:
-            plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuAl4_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
-        else:
-            if EuGa4 == True:
-                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuGa4_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
-            else:
-                plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuGa2Al2_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
-    else:
-        pass
-    # """3D ATOM PLOT"""
-    # fig = plt.figure()
-    # ax = fig.add_subplot(projection='3d')
-    # # ax.title("Supercell with Wyckoff 4e z-parameter z0={}".format(z0))
-    # # ax.scatter(Eu[0], Eu[1], Eu[2], label='2a (000)', c='yellow')
-    # # ax.scatter(Eu_T[0], Eu_T[1], Eu_T[2], label='2a T(000)', facecolors='none', edgecolors='yellow')
-    # ax.scatter(Al1[0], Al1[1], Al1[2], label='4d (1/2 0 1/4), (0 1/2 1/4)', c='blue')
-    # ax.scatter(Al1_T[0], Al1_T[1], Al1_T[2], facecolors='none', edgecolors='blue')
-    # ax.scatter(Al2[0], Al2[1], Al2[2], c='blue')
-    # ax.scatter(Al2_T[0], Al2_T[1], Al2_T[2], facecolors='none', edgecolors='blue')
-    # ax.scatter(Ga1[0], Ga1[1], Ga1[2], label='4e (0 0 z0), (0 0 -z0)', c='green')
-    # ax.scatter(Ga1_T[0], Ga1_T[1], Ga1_T[2], facecolors='none', edgecolors='green')
-    # ax.scatter(Ga2[0], Ga2[1], Ga2[2], c='green')
-    # ax.scatter(Ga2_T[0], Ga2_T[1], Ga2_T[2], facecolors='none', edgecolors='green')
-    # # ax.set_xlim(-0.5, 1.5)
-    # # ax.set_ylim(-0.5, 1.5)
+    # fig = plt.figure()  
+    # if EuAl4 == True:
+    #     plt.suptitle("EuAl4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+    # else:
+    #     if EuGa4 == True:
+    #         plt.suptitle("EuGa4 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+    #     else:
+    #         plt.suptitle("EuGa2Al2 I4/mmm, q={}rlu, [H{}L]".format(q_cdw, K))
+    # """CONVOLUTION"""
+    # plt.title("[H{}L], q={}rlu".format(K, q_cdw))
+    # x, y = np.linspace(-1, 1, kernelsize), np.linspace(-1, 1, kernelsize)
+    # X, Y = np.meshgrid(x, y)     
+    # kernel = 1/(2*np.pi*sigma**2)*np.exp(-(X**2+Y**2)/(2*sigma**2)) 
+    # Iconv = ndimage.convolve(I, kernel, mode='constant', cval=0.0)
+    # # Add noise
+    # Iconv = Iconv + np.abs(np.random.randn(len(h), len(h))) * noiseamplitude 
+    # if lognorm == True:
+    #     plt.imshow(Iconv, cmap=cmap, 
+    #                extent=(h0-hmax,h0+hmax,l0-lmax,l0+lmax),
+    #                origin='lower', aspect='auto',
+    #                norm=LogNorm(vmin=1, vmax=np.max(Iconv))
+    #             )
+    # else:
+    #     plt.imshow(Iconv, cmap=cmap, 
+    #                extent=(h0-hmax,h0+hmax,l0-lmax,l0+lmax), 
+    #                origin='lower', 
+    #                vmin=0, vmax = np.max(Iconv)
+    #             )          
+    # plt.colorbar()
+    # # plt.xlim(2, 8)     
+    # # plt.ylim(-13, 8)    
+    # plt.ylabel("L (r.l.u.)")      
+    # plt.xlabel("H (r.l.u.)")   
+    # if savefig == True:
+    #     if EuAl4 == True:
+    #         plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuAl4_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
+    #     else:
+    #         if EuGa4 == True:
+    #             plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuGa4_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
+    #         else:
+    #             plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/H{}L_EuGa2Al2_q={}_optimized.jpg".format(K, q_cdw), dpi=300, bbox_inches='tight')
+    # else:
+    #     pass
+    # # """3D ATOM PLOT"""
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+# =============================================================================
+#     I4/mmm
+# =============================================================================
+# 3D Plot
+    # ax.set_title("Immm supercell with Wyckoff 4e z-parameter z={}".format(z0))
+    # usable_pointsx = (x < 1) 
+    # usable_pointsx = (y < 1) 
+    # usable_pointsz  = (z < 5)
+    # Eu[0], Eu[1], Eu[2] = Eu[0].flatten(), Eu[1].flatten(), Eu[2].flatten()
+    # usable_points = (Eu[0] < 1) & (Eu[1] < 1) & (Eu[2] < 5)
+    # Eu[0], Eu[1], Eu[2] = Eu[0][usable_points], Eu[1][usable_points], Eu[2][usable_points]
+    # Eu[0], Eu[1], Eu[2] = Eu[0].flatten(), Eu[1].flatten(), Eu[2].flatten()
+    # Eu[0], Eu[1], Eu[2] = Eu[0][usable_pointsxy], Eu[1][usable_pointsxy], Eu[2][usable_pointsz]
+    # Eu_T[0], Eu_T[1], Eu_T[2] = Eu_T[0].flatten(), Eu_T[1].flatten(), Eu_T[2].flatten()
+    # Eu_T[0], Eu_T[1], Eu_T[2] = Eu_T[0][usable_pointsxy], Eu_T[1][usable_pointsxy], Eu_T[2][usable_pointsz]
+    # x, y, z = Al1[0].flatten(), Al1[1].flatten(), Al1[2].flatten()
+    # Al1[0], Al1[1], Al1[2] = x[usable_points], y[usable_points], z[usable_points]
+    # x, y, z = Al1_T[0].flatten(), Al1_T[1].flatten(), Al1_T[2].flatten()
+    # Al1_T[0], Al1_T[1], Al1_T[2] = x[usable_points], y[usable_points], z[usable_points]
+    # x, y, z = Al2[0].flatten(), Al2[1].flatten(), Al2[2].flatten()
+    # Al2[0], Al2[1], Al2[2] = x[usable_points], y[usable_points], z[usable_points]
+    # x, y, z = Al2_T[0].flatten(), Al2_T[1].flatten(), Al2_T[2].flatten()
+    # Al2_T[0], Al2_T[1], Al2_T[2] = x[usable_points], y[usable_points], z[usable_points]
+    # x, y, z = Ga1[0].flatten(), Ga1[1].flatten(), Ga1[2].flatten()
+    # Ga1[0], Ga1[1], Ga1[2] = x[usable_points], y[usable_points], z[usable_points]
+    # x, y, z = Ga1[0].flatten(), Ga1[1].flatten(), Ga1[2].flatten()
+    # Ga1_T[0], Ga1_T[1], Ga1_T[2] = x[usable_points], y[usable_points], z[usable_points]
+    # x, y, z = Ga1_T[0].flatten(), Ga1_T[1].flatten(), Ga1_T[2].flatten()
+    # Ga2[0], Ga2[1], Ga2[2] = x[usable_points], y[usable_points], z[usable_points]
+    # x, y, z = Ga2[0].flatten(), Ga2[1].flatten(), Ga2[2].flatten()
+    # Ga2_T[0], Ga2_T[1], Ga2_T[2] = x[usable_points], y[usable_points], z[usable_points]
+    ax.scatter(Eu[0], Eu[1], Eu[2], 
+               c='yellow', 
+               s=100)
+    ax.scatter(Eu_T[0], Eu_T[1], Eu_T[2], 
+               c='yellow',
+               s=100)
+    ax.scatter(Al1[0], Al1[1], Al1[2], label='4d ', 
+               c='blue', 
+               s=20)
+    ax.scatter(Al1_T[0], Al1_T[1], Al1_T[2], 
+               c='blue', 
+               s=20)
+    ax.scatter(Al2[0], Al2[1], Al2[2], 
+               c='blue', 
+               s=20)
+    ax.scatter(Al2_T[0], Al2_T[1], Al2_T[2], 
+               c='blue', 
+               s=20)
+    ax.scatter(Ga1[0], Ga1[1], Ga1[2], label='4e', 
+               c='green', 
+               s=20)
+    ax.scatter(Ga1_T[0], Ga1_T[1], Ga1_T[2], 
+               c='green', 
+               s=20)
+    ax.scatter(Ga2[0], Ga2[1], Ga2[2], 
+               c='green', 
+               s=20)
+    ax.scatter(Ga2_T[0], Ga2_T[1], Ga2_T[2], 
+               c='green', 
+               s=20)
+    # ax.set_xlim(-5, 5.0)
+    # ax.set_ylim(-5, 5.0)
+    # ax.set_zlim(0, 0.01)
     # ax.set_xlabel('X')
     # ax.set_ylabel('Y')
     # ax.set_zlabel('Z')
+    # ax.axis('off')
+    # ax.set_proj_type('persp', focal_length=1)
+    ax.view_init(elev=0, azim=-90)
+    ax.set_aspect('equal', adjustable='box')
+    plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/5UC_T>Tcdw_q={}.jpg".format(q_cdw), transparent = True, bbox_inches= 'tight', dpi=600, edgecolor= None)
+    plt.legend()
+    # # 2D Plot
+    # fig = plt.figure(figsize=(3, 7))
+    # plt.scatter(Eu[0], Eu[2], label='Eu', c='k', s=50)
+    # # plt.scatter(Eu_T[0], Eu_T[2], c='k', s=50)
+    # plt.scatter(Al1[0], Al1[2], label='Al1', c='g', s=20)
+    # # plt.scatter(Al1_T[0], Al1_T[2], c='g', s=20)
+    # plt.scatter(Al2[0], Al2[2], label='Al1',c ='g', s=20)
+    # # plt.scatter(Al2_T[0], Al2_T[2],c ='g', s=20)
+    # plt.scatter(Ga1[0], Ga1[2], label='Al2', c='b', s=20)
+    # # plt.scatter(Ga1_T[0], Ga1_T[2], c='b', s=20)
+    # plt.scatter(Ga2[0], Ga2[2], label='Al2',c ='b', s=20)
+    # # plt.scatter(Ga2_T[0], Ga2_T[2],c ='b', s=20)
     # plt.legend()
-    # plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/Structure_q={}.jpg".format(q_cdw), dpi=300)
+    # plt.savefig("/Users/stevengebel/PycharmProjects/EuGaAl_P07/XRD_Simulation/Eu(Ga,Al)4_modulation1/2D_1412_Structure_q={}.jpg".format(q_cdw), dpi=300)
     plt.show(block=False)
-    return Iconv
+   # return Iconv
 
 
 def main_HKL0(a, c, h0, k0, h2d, h, k, hmax, kmax, k2d, L, 
